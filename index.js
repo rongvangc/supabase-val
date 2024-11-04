@@ -19,33 +19,27 @@ app.use(bodyParser.json());
 
 // Endpoint kiểm tra tính hợp lệ của email
 app.post("/validate-email", async (req, res) => {
-  const { email } = req.body;
+  const { token_hash } = req.query;
 
-  if (!email) {
-    return res.status(400).json({ error: "Email không được để trống" });
+  if (!token_hash) {
+    return res.status(400).json({ error: "Fail to get token_hash" });
   }
 
   try {
-    const { data, error } = await supabase
-      .from("emails") // Tên bảng chứa địa chỉ email
-      .select("*")
-      .eq("email", email)
-      .single(); // Lấy một bản ghi
+    const { data, error } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: "email",
+    });
 
-    if (error) {
+    if (error?.message) {
       return res.status(500).json({ error: error.message });
     }
 
-    if (data) {
-      return res.status(200).json({ valid: true, email: data });
-    } else {
-      return res.status(404).json({
-        valid: false,
-        message: "Email không hợp lệ hoặc không tồn tại.",
-      });
-    }
+    return {
+      data,
+    };
   } catch (err) {
-    return res.status(500).json({ error: "Đã xảy ra lỗi: " + err.message });
+    return res.status(500).json({ error: "Something wrong: " + err.message });
   }
 });
 
