@@ -18,28 +18,27 @@ const PORT = process.env.PORT || 3000;
 app.use(bodyParser.json());
 
 // Endpoint kiểm tra tính hợp lệ của email
-app.post("/validate-email", async (req, res) => {
+app.get("/validate-email", async (req, res) => {
   const { token_hash } = req.query;
 
+  // Kiểm tra xem token_hash có tồn tại không
   if (!token_hash) {
-    return res.status(400).json({ error: "Fail to get token_hash" });
+    return res.status(400).json({ error: "token_hash không được để trống" });
   }
 
   try {
     const { data, error } = await supabase.auth.verifyOtp({
-      token_hash: tokenHash,
+      token_hash: token_hash, // Sử dụng token_hash từ query
       type: "email",
     });
 
-    if (error?.message) {
+    if (error) {
       return res.status(500).json({ error: error.message });
     }
 
-    return {
-      data,
-    };
+    return res.status(200).json({ data }); // Trả về dữ liệu
   } catch (err) {
-    return res.status(500).json({ error: "Something wrong: " + err.message });
+    return res.status(500).json({ error: "Đã xảy ra lỗi: " + err.message });
   }
 });
 
