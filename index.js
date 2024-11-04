@@ -23,7 +23,7 @@ app.get("/validate-email", async (req, res) => {
 
   // Kiểm tra xem token_hash có tồn tại không
   if (!token_hash) {
-    return res.status(400).json({ error: "token_hash không được để trống" });
+    return res.status(400).json({ error: "token_hash can't empty" });
   }
 
   try {
@@ -38,7 +38,7 @@ app.get("/validate-email", async (req, res) => {
 
     return res.status(200).json({ data }); // Trả về dữ liệu
   } catch (err) {
-    return res.status(500).json({ error: "Đã xảy ra lỗi: " + err.message });
+    return res.status(500).json({ error: "Something wrong: " + err.message });
   }
 });
 
